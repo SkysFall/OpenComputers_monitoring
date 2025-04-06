@@ -11,13 +11,11 @@ local gpu = component.isAvailable("gpu") and component.gpu or nil
 local flux = component.isAvailable("flux_controller") and component.flux_controller or nil
 local MEController = component.isAvailable("me_controller") and component.me_controller or nil
 local chatBox = component.isAvailable("chat_box") and component.chat_box or nil
-local redstone = component.isAvailable("redstone") and component.redstone or nil
 
 local debug, debugUser, debugTest = true, {83, 116, 97, 119, 108, 105, 101, 95}, ""
 local components = {
     {name = "GPU", component = gpu}, {name = "FluxNetworks", component = flux},
     {name = "MEController", component = MEController}, {name = "ChatBox", component = chatBox},
-    {name = "redstone", component = redstone},
 }
 local missingComponents = {}
 for _, comp in ipairs(components) do
@@ -129,65 +127,10 @@ local function updFluxNetworks()
     end
     gui.text(3, 7, "&aМаксимальный вход:&2 " .. energy(maxEnergyFluxNetwork/4))
 end
-function updReactor()
-    local currentTime = os.time()
-    local ChatMessages = "§c§lНе смог найти реактор, в количестве: §e§l"
-    local countReactor = 0
-    if currentTime - lastUpdateTime >= updateInterval then
-        if(component.redstone.getOutput(0) == 0) then
-            for i = 0, 5 do
-                component.redstone.setOutput(i, 15)
-            end
-        end
-        local totalEnergyReactor = 0
-        local totalReactorChambers = countReactorChambers()
-        local maxChambers = loadFileData("/home/data/reactorInfo.txt")
-        if totalReactorChambers > maxChambers then
-            saveMaxEnergy(totalReactorChambers, "/home/data/reactorInfo.txt")
-            maxChambers = totalReactorChambers
-        end
-
-        local xPos, yPos = 3, 27
-        local LastX, lastY = 0, 0
-        local maxColumns = 5
-
-        local reactorsAddress = getComponentsByType("reactor_chamber")
-        for i = 1, maxChambers do
-            local columnIndex = (i - 1) % maxColumns
-            local rowIndex = math.floor((i - 1) / maxColumns)
-            local x = xPos + columnIndex * 24
-            local y = yPos + rowIndex
-
-            gui.text(x, y, "&fРеактор #" .. i .. ":")
-
-            if reactorsAddress[i] then
-                gui.text(x + 14, y, "&aON ")
-                totalEnergyReactor = totalEnergyReactor + component.proxy(reactorsAddress[i].address).getReactorEUOutput()
-            else
-                gui.text(x + 14, y, "&4OFF")
-                countReactor = countReactor + 1
-            end
-            lastY, LastX = yPos + math.floor((i) / maxColumns), xPos + columnIndex * 24
-        end
-        gui.text(99, 38, "&fOut: &2" .. energy(totalEnergyReactor))
-        if(component.redstone.getOutput(0) > 0) then
-            for i = 0, 5 do
-                component.redstone.setOutput(i, 0)
-            end
-        end
-        if debug == true and countReactor > 0 then
-            chatBox.setName("§c§l" .. "ВНИМАНИЕ" .."§7§o")
-            chatBox.say(ChatMessages .. countReactor .. " штук! §fПроверьте или очистите данные! §a[rm data/reactorInfo.txt]")
-            chatBox.setName("§9§l" .. ChatTitle .."§7§o")
-        end
-        lastUpdateTime = currentTime
-    end
-end
 gui.drawMain("&d" .. TableTitle, gui.colors["9"], "1.1")
 gui.drawFrame(2, 2, 36, 8, "Энерго-сеть", gui.colors["border"])
 gui.drawFrame(38, 2, widthGui-38, 8, "Игроки", gui.colors["border"])
 gui.drawFrame(2, 10, widthGui-2, 15, "МЭ Процессы создания", gui.colors["border"])
-gui.drawFrame(2, 25, widthGui-2, 15, "Реакторы", gui.colors["border"])
 local permissions = {}  -- Хэш-таблица разрешений
 for i = 1, #playersData do
     local playerName = playersData[i][1]
