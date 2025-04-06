@@ -76,14 +76,5 @@ function getComponentsByType(componentType)
     return components
 end
 
-function countReactorChambers()
-    local reactorChambers = component.list("reactor_chamber")
-    local count = 0
-    for _ in pairs(reactorChambers) do
-        count = count + 1
-    end
-    return count
-end
-
 lastUpdateTime = 0
 updateInterval = 3000
