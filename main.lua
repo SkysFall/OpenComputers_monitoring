@@ -175,7 +175,6 @@ while true do
     updFluxNetworks()
     updatePlayersDisplay()
     updMEController()
-    updReactor()
     computer.pullSignal(0.1)
 end
 --emulatedMEController(gui)
